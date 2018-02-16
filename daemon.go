@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"strconv"
 	"log"
-	"path/filepath"
+
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -29,29 +30,48 @@ func NewDaemon(config *Config) *Daemon {
 func (d *Daemon) Start() {
 	// variables
 	var port string = ":" + strconv.Itoa(int(d.config.Port))
-	// static files
-	filePrefix, _ := filepath.Abs("static")
-	fs := http.FileServer(http.Dir(filePrefix))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-	// handlers
-	http.HandleFunc("/", d.handlerHome)
-	// start server
-	var err = http.ListenAndServe(port, nil)
+
+	// same in mux
+	r := mux.NewRouter()
+
+	// static files handler
+	staticFiles := http.Dir(d.config.Static)
+	staticFilesHandler := http.StripPrefix("/static/", http.FileServer(staticFiles))
+	r.PathPrefix("/static/").Handler(staticFilesHandler).Methods("GET")
+
+	// other
+	r.HandleFunc("/{controller}/{action}/", d.preHandler(d.handler))
+
+	var err = http.ListenAndServe(port, r)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
+// Runs before handling
+func (d *Daemon) preHandler(f http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.URL.Path)
+		f(w, r)
+	}
+}
+
 // Handler: Home
-func (d *Daemon) handlerHome(w http.ResponseWriter, r *http.Request) {
+func (d *Daemon) handler(w http.ResponseWriter, r *http.Request) {
+	/*
+	varsm := mux.Vars(r)
+	controller := varsm["controller"]
+	action := varsm["action"]
+	request := varsm["request"]
+	*/
+
 	// variables
 	vars := struct {
 		Version string
 	}{
 		Version: goWebIdentifier,
 	}
-	filePrefix, _ := filepath.Abs(d.config.Design)
-	t, err := template.ParseFiles(filePrefix + "/page.html")
+	t, err := template.ParseFiles(d.config.Template + "/page.html")
 	if err != nil { // if there is an error
 		log.Print("template parsing error: ", err)
 	}

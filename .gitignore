@@ -15,3 +15,6 @@
 
 # Idea
 .idea/
+
+# Binary
+go-web-skeleton
