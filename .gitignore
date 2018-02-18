@@ -16,5 +16,6 @@
 # Idea
 .idea/
 
-# Binary
+# Project
 go-web-skeleton
+*log
