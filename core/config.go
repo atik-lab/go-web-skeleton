@@ -1,4 +1,4 @@
-package main
+package core
 
 type Config struct {
 	Debug			bool
@@ -14,7 +14,7 @@ func NewConfig() *Config {
 		Debug: false,
 		Port: 8080,
 		Verbose: true,
-		Template: "template/",
+		Template: "app/template/",
 		Static: "static/",
 	}
 }

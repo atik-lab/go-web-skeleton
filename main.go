@@ -2,16 +2,17 @@ package main
 
 import (
 	"flag"
+	"github.com/atik-lab/go-web-skeleton/core"
 )
 
 var (
-	config		*Config
-	daemon		*Daemon
+	config		*core.Config
+	daemon		*core.Daemon
 )
 
 // Main, get flags and start daemon
 func main() {
-	config = NewConfig()
+	config = core.NewConfig()
 
 	// Parse flags and process config
 	flag.UintVar(&config.Port, "p", config.Port, "Port to listen")
@@ -20,6 +21,6 @@ func main() {
 	flag.Parse()
 
 	// Start daemon
-	daemon = NewDaemon(config)
+	daemon = core.NewDaemon(config)
 	daemon.Start()
 }

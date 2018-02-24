@@ -1,13 +1,13 @@
-package main
+package core
 
 import (
-	"html/template"
 	"net/http"
 	"fmt"
 	"strconv"
-	"log"
 
 	"github.com/gorilla/mux"
+
+	"github.com/atik-lab/go-web-skeleton/app"
 )
 
 const (
@@ -42,7 +42,8 @@ func (d *Daemon) Start() {
 	r.PathPrefix("/static/").Handler(staticFilesHandler).Methods("GET")
 
 	// other
-	r.HandleFunc("/{controller}/{action}/", d.preHandler(d.handler))
+	var router = app.NewRouter()
+	router.Route()
 
 	var err = http.ListenAndServe(port, r)
 	if err != nil {
@@ -58,27 +59,3 @@ func (d *Daemon) preHandler(f http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// Handler: Home
-func (d *Daemon) handler(w http.ResponseWriter, r *http.Request) {
-	/*
-	varsm := mux.Vars(r)
-	controller := varsm["controller"]
-	action := varsm["action"]
-	request := varsm["request"]
-	*/
-
-	// variables
-	vars := struct {
-		Version string
-	}{
-		Version: GoWebIdentifier,
-	}
-	t, err := template.ParseFiles(d.config.Template + "/page.html")
-	if err != nil { // if there is an error
-		log.Print("Template parsing error: ", err)
-	}
-	err = t.Execute(w, vars)
-	if err != nil { // if there is an error
-		log.Print("Template executing error: ", err)
-	}
-}

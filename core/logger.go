@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"log"
@@ -72,7 +72,6 @@ func (l *Logger) printStdout(msg string, color int) {
 		fmt.Println(colorized)
 	}
 }
-
 
 // Log Debug
 func (l *Logger) debug(msg string) {
